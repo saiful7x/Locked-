@@ -29,6 +29,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract project zip if uploaded
+        run: |
+          if [ -f "saiful-lock-ai-android-github.zip" ]; then
+            unzip -o saiful-lock-ai-android-github.zip -x ".github/*"
+          fi
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:

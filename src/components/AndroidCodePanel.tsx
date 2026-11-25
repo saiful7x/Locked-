@@ -6,16 +6,29 @@ import { createZipBlob } from '../utils/zipBuilder';
 export function AndroidCodePanel() {
   const [selectedId, setSelectedId] = useState<string>(ANDROID_KOTLIN_FILES[0].id);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedWorkflow, setCopiedWorkflow] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
 
   const activeFile =
     ANDROID_KOTLIN_FILES.find((f) => f.id === selectedId) ?? ANDROID_KOTLIN_FILES[0];
+  const workflowFile = ANDROID_KOTLIN_FILES[0];
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(activeFile.code);
       setCopiedId(activeFile.id);
       setTimeout(() => setCopiedId(null), 1800);
+    } catch {
+      // Fallback ignored in restricted clipboard contexts
+    }
+  };
+
+  const handleCopyWorkflow = async () => {
+    try {
+      await navigator.clipboard.writeText(workflowFile.code);
+      setCopiedWorkflow(true);
+      setSelectedId(workflowFile.id);
+      setTimeout(() => setCopiedWorkflow(false), 2000);
     } catch {
       // Fallback ignored in restricted clipboard contexts
     }
@@ -49,12 +62,12 @@ export function AndroidCodePanel() {
               GitHub Actions Android APK Project
             </h3>
             <p className="text-xs text-slate-400">
-              Complete Gradle + Kotlin + GitHub Workflow (.github/workflows/build-apk.yml)
+              Mobile Browser-Friendly: Upload ZIP + Paste build-apk.yml in New Workflow
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleDownloadZip}
@@ -69,6 +82,24 @@ export function AndroidCodePanel() {
               <>
                 <Download className="h-3.5 w-3.5" />
                 Download GitHub ZIP
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleCopyWorkflow}
+            className="inline-flex min-h-[36px] items-center gap-1.5 rounded-lg border border-cyan-600/50 bg-cyan-950/50 px-3 py-1.5 text-xs font-semibold text-cyan-300 transition-colors hover:bg-cyan-900/60 whitespace-nowrap shrink-0"
+          >
+            {copiedWorkflow ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-cyan-400" />
+                Workflow Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                Copy Workflow YAML
               </>
             )}
           </button>
@@ -94,12 +125,26 @@ export function AndroidCodePanel() {
       </div>
 
       {/* GitHub Build Quick Steps */}
-      <div className="flex flex-wrap items-center gap-2 border-b border-emerald-900/30 bg-[#050b08] px-4 py-2 text-xs text-slate-300">
-        <GitBranch className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
-        <span>
-          <strong className="text-emerald-400">GitHub APK Build:</strong>{' '}
-          1) Download GitHub ZIP করে Unzip করুন · 2) `.github` ফোল্ডারসহ GitHub Repo-তে Push/Upload করুন · 3) Actions ট্যাব থেকে `app-debug.apk` ডাউনলোড করুন।
-        </span>
+      <div className="flex flex-col gap-1 border-b border-emerald-900/30 bg-[#050b08] px-4 py-2.5 text-xs text-slate-300">
+        <div className="flex items-center gap-2">
+          <GitBranch className="h-3.5 w-3.5 shrink-0 text-cyan-400" />
+          <strong className="text-emerald-400">
+            ফোন থেকে GitHub APK Build করার নিয়ম (সহজ পদ্ধতি):
+          </strong>
+        </div>
+        <p className="leading-relaxed text-slate-300">
+          ১) <strong>Download GitHub ZIP</strong> চাপুন এবং GitHub Repo-তে{' '}
+          <code className="text-cyan-300">Add file → Upload files</code> দিয়ে সরাসরি{' '}
+          <code className="text-emerald-300">saiful-lock-ai-android-github.zip</code>{' '}
+          ফাইলটি আপলোড করে Commit করুন।
+        </p>
+        <p className="leading-relaxed text-slate-300">
+          ২) আপনার স্ক্রিনশটের <strong>Actions</strong> ট্যাবে থাকা{' '}
+          <strong className="text-cyan-300">New workflow → set up a workflow yourself</strong>{' '}
+          চাপুন, ফাইলের নাম দিন <code className="text-emerald-300">build-apk.yml</code>,
+          তারপর <strong>Copy Workflow YAML</strong> বাটন থেকে কোড পেস্ট করে Commit করুন।
+          ১–২ মিনিট পর Actions থেকে APK ডাউনলোড করতে পারবেন।
+        </p>
       </div>
 
       {/* File Tabs */}
