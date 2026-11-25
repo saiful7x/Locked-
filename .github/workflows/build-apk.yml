@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK & AAB
 
 on:
   push:
@@ -19,37 +19,62 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: |
+          if [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          fi
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Build Debug APK
+      - name: Prepare Optional Play Console Keystore
+        id: keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > "${{ runner.temp }}/upload-keystore.jks"
+            echo "KEYSTORE_FILE=${{ runner.temp }}/upload-keystore.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build Debug APK & Play Console AAB
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
           if [ -f "android-app/settings.gradle.kts" ]; then
             cd android-app
-            gradle assembleDebug --no-daemon
+            gradle assembleDebug bundleRelease --no-daemon
           elif [ -f "saiful-lock-ai-android-github.zip" ]; then
             unzip -o saiful-lock-ai-android-github.zip -x ".github/*"
-            gradle assembleDebug --no-daemon
+            gradle assembleDebug bundleRelease --no-daemon
           else
-            gradle assembleDebug --no-daemon
+            gradle assembleDebug bundleRelease --no-daemon
           fi
 
-      - name: Locate Debug APK
-        id: find_apk
+      - name: Locate Build Outputs (APK & AAB)
+        id: outputs
         run: |
           if [ -f "android-app/app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "apk_path=android-app/app/build/outputs/apk/debug/app-debug.apk" >> $GITHUB_OUTPUT
+            echo "apk_path=android-app/app/build/outputs/apk/debug/app-debug.apk" >> "$GITHUB_OUTPUT"
+            echo "aab_path=android-app/app/build/outputs/bundle/release/app-release.aab" >> "$GITHUB_OUTPUT"
           else
-            echo "apk_path=app/build/outputs/apk/debug/app-debug.apk" >> $GITHUB_OUTPUT
+            echo "apk_path=app/build/outputs/apk/debug/app-debug.apk" >> "$GITHUB_OUTPUT"
+            echo "aab_path=app/build/outputs/bundle/release/app-release.aab" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: saiful-lock-ai-debug-apk
-          path: ${{ steps.find_apk.outputs.apk_path }}
+          path: ${{ steps.outputs.outputs.apk_path }}
+
+      - name: Upload Play Console AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: saiful-lock-ai-playconsole-aab
+          path: ${{ steps.outputs.outputs.aab_path }}

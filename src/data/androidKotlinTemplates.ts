@@ -13,8 +13,8 @@ export const ANDROID_KOTLIN_FILES: AndroidCodeFile[] = [
     filename: 'build-apk.yml',
     path: '.github/workflows/build-apk.yml',
     language: 'yaml',
-    summary: 'GitHub Actions workflow that compiles the Android project and outputs app-debug.apk.',
-    code: `name: Build Android APK
+    summary: 'GitHub Actions workflow that builds both Debug APK and Play Console Release AAB.',
+    code: `name: Build Android APK & AAB
 
 on:
   push:
@@ -41,22 +41,44 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+      - name: Accept Android SDK Licenses
+        run: |
+          if [ -d "$ANDROID_HOME/cmdline-tools/latest/bin" ]; then
+            yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          fi
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
 
-      - name: Build Debug APK
-        run: gradle assembleDebug --no-daemon
+      - name: Prepare Optional Play Console Keystore
+        env:
+          KEYSTORE_BASE64: \${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 --decode > "\${{ runner.temp }}/upload-keystore.jks"
+            echo "KEYSTORE_FILE=\${{ runner.temp }}/upload-keystore.jks" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build Debug APK & Play Console AAB
+        env:
+          KEYSTORE_PASSWORD: \${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: \${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: \${{ secrets.KEY_PASSWORD }}
+        run: gradle assembleDebug bundleRelease --no-daemon
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: saiful-lock-ai-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk`
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Upload Play Console AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: saiful-lock-ai-playconsole-aab
+          path: app/build/outputs/bundle/release/app-release.aab`
   },
   {
     id: 'readme',
@@ -147,6 +169,18 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        create("release") {
+            val ksPath = System.getenv("KEYSTORE_FILE")
+            if (!ksPath.isNullOrBlank()) {
+                storeFile = file(ksPath)
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -154,6 +188,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (!System.getenv("KEYSTORE_FILE").isNullOrBlank()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -172,6 +209,15 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 }`
+  },
+  {
+    id: 'proguard_rules',
+    filename: 'proguard-rules.pro',
+    path: 'app/proguard-rules.pro',
+    language: 'text',
+    summary: 'ProGuard keep rules for release AAB bundle.',
+    code: `# ProGuard rules for Saiful Lock AI
+-keep class com.saiful.lockai.** { *; }`
   },
   {
     id: 'manifest',
