@@ -1,0 +1,6 @@
+{
+  "name": "Saiful Lock AI",
+  "description": "Matrix-themed Android screen lock & status bar blocker prototype with Display Over Other Apps permission flow, PIN unlock overlay, and native Kotlin code.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
