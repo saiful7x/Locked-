@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.SaifulLockAI" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">#020604</item>
+        <item name="android:navigationBarColor">#020604</item>
+    </style>
+</resources>

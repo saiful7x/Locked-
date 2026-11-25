@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#020604"
+    android:clickable="true"
+    android:focusable="true">
+
+    <com.saiful.lockai.MatrixBackgroundView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="SHUTTER BLOCKED · NOTIFICATIONS HIDDEN"
+            android:textColor="#F87171"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="ফোন লক করা আছে"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center"
+            android:text="আনলক না করা পর্যন্ত শাটার, নোটিফিকেশন ও কোনো অ্যাপ ব্যবহার করা যাবে না।"
+            android:textColor="#CBD5E1"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tvPinDots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:fontFamily="monospace"
+            android:text="○ ○ ○ ○"
+            android:textColor="#22C55E"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/tvLockError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="৪ সংখ্যার PIN দিন"
+            android:textColor="#F87171"
+            android:textSize="13sp" />
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:columnCount="3"
+            android:rowCount="4">
+
+            <Button android:id="@+id/btn1" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="1" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn2" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="2" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn3" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="3" android:textColor="#FFFFFF" android:textSize="20sp" />
+
+            <Button android:id="@+id/btn4" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="4" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn5" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="5" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn6" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="6" android:textColor="#FFFFFF" android:textSize="20sp" />
+
+            <Button android:id="@+id/btn7" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="7" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn8" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="8" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btn9" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="9" android:textColor="#FFFFFF" android:textSize="20sp" />
+
+            <Button android:id="@+id/btnClear" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#1E293B" android:text="CLR" android:textColor="#CBD5E1" android:textSize="13sp" />
+            <Button android:id="@+id/btn0" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#0A1A13" android:text="0" android:textColor="#FFFFFF" android:textSize="20sp" />
+            <Button android:id="@+id/btnBack" android:layout_width="76dp" android:layout_height="60dp" android:layout_margin="6dp" android:backgroundTint="#1E293B" android:text="DEL" android:textColor="#CBD5E1" android:textSize="13sp" />
+        </GridLayout>
+    </LinearLayout>
+</FrameLayout>

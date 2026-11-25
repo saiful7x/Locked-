@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Saiful Lock AI</string>
+    <string name="accessibility_lock_description">Blocks notification shade pull-down and system navigation while phone is locked until PIN is entered.</string>
+</resources>
